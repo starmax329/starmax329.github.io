@@ -20,6 +20,10 @@
             background-color: #000;
             position: relative;
             border: 2px solid #fff;
+            display: grid;
+            grid-template-columns: repeat(20, 1fr);
+            grid-template-rows: repeat(20, 1fr);
+            gap: 1px;
         }
         .snake {
             position: absolute;
@@ -53,6 +57,12 @@
                 transform: scale(1);
             }
         }
+
+        /* Add grid lines for the game board */
+        .grid-line {
+            background-color: #444; /* Color of the grid lines */
+        }
+
     </style>
 </head>
 <body>
@@ -71,6 +81,25 @@
         let food = { x: 10, y: 10 };
         let score = 0;
         let gameInterval;
+
+        // Create the grid lines
+        function createGridLines() {
+            for (let i = 0; i < gridSize; i++) {
+                // Create vertical grid lines
+                const verticalLine = document.createElement('div');
+                verticalLine.style.gridRow = `span ${gridSize}`;
+                verticalLine.style.width = '1px';
+                verticalLine.classList.add('grid-line');
+                board.appendChild(verticalLine);
+
+                // Create horizontal grid lines
+                const horizontalLine = document.createElement('div');
+                horizontalLine.style.gridColumn = `span ${gridSize}`;
+                horizontalLine.style.height = '1px';
+                horizontalLine.classList.add('grid-line');
+                board.appendChild(horizontalLine);
+            }
+        }
 
         // Initialize the game
         function startGame() {
@@ -170,6 +199,9 @@
 
         // Start the game when the page loads
         startGame();
+
+        // Create the grid lines
+        createGridLines();
 
         // Add event listener for keypresses
         document.addEventListener('keydown', handleKeyPress);
