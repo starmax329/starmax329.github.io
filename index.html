@@ -15,28 +15,24 @@
             font-family: Arial, sans-serif;
         }
         #game-board {
-            width: 400px;
-            height: 400px;
+            width: 600px; /* Increased width of the board */
+            height: 600px; /* Increased height of the board */
             background-color: #000;
             position: relative;
             border: 2px solid #fff;
-            display: grid;
-            grid-template-columns: repeat(20, 1fr);
-            grid-template-rows: repeat(20, 1fr);
-            gap: 1px;
         }
         .snake {
             position: absolute;
-            width: 20px;
-            height: 20px;
+            width: 30px; /* Adjusted snake size to match larger grid */
+            height: 30px; /* Adjusted snake size */
             background-color: #00ff00;
             border-radius: 4px;
             transition: transform 0.1s linear; /* Smooth transition for snake movement */
         }
         .food {
             position: absolute;
-            width: 20px;
-            height: 20px;
+            width: 30px; /* Adjusted food size */
+            height: 30px; /* Adjusted food size */
             background-color: red;
             border-radius: 50%;
             animation: foodPop 0.3s ease; /* Food popping effect */
@@ -58,9 +54,22 @@
             }
         }
 
-        /* Add grid lines for the game board */
+        /* Create grid lines for the entire game board */
         .grid-line {
+            position: absolute;
             background-color: #444; /* Color of the grid lines */
+        }
+
+        /* Horizontal grid lines */
+        .horizontal-line {
+            width: 100%;
+            height: 1px;
+        }
+
+        /* Vertical grid lines */
+        .vertical-line {
+            height: 100%;
+            width: 1px;
         }
 
     </style>
@@ -73,31 +82,31 @@
     <script>
         const board = document.getElementById('game-board');
         const scoreDisplay = document.getElementById('score');
-        const gridSize = 20;  // Number of grid cells per side
-        const boardSize = 400; // Size of the board in pixels
-        const cellSize = boardSize / gridSize; // Size of each cell in pixels
+        const gridSize = 20;  // Number of grid cells per side (still 20, but adjusting cell size)
+        const boardSize = 600; // Increased board size (600px by 600px)
+        const cellSize = boardSize / gridSize; // Adjusted cell size based on larger board
         let snake = [{ x: 5, y: 5 }];
         let direction = { x: 1, y: 0 };
         let food = { x: 10, y: 10 };
         let score = 0;
         let gameInterval;
 
-        // Create the grid lines
+        // Create the grid lines for the entire game board
         function createGridLines() {
-            for (let i = 0; i < gridSize; i++) {
-                // Create vertical grid lines
-                const verticalLine = document.createElement('div');
-                verticalLine.style.gridRow = `span ${gridSize}`;
-                verticalLine.style.width = '1px';
-                verticalLine.classList.add('grid-line');
-                board.appendChild(verticalLine);
+            // Create horizontal grid lines
+            for (let i = 0; i <= gridSize; i++) {
+                const line = document.createElement('div');
+                line.classList.add('grid-line', 'horizontal-line');
+                line.style.top = `${i * cellSize}px`;
+                board.appendChild(line);
+            }
 
-                // Create horizontal grid lines
-                const horizontalLine = document.createElement('div');
-                horizontalLine.style.gridColumn = `span ${gridSize}`;
-                horizontalLine.style.height = '1px';
-                horizontalLine.classList.add('grid-line');
-                board.appendChild(horizontalLine);
+            // Create vertical grid lines
+            for (let i = 0; i <= gridSize; i++) {
+                const line = document.createElement('div');
+                line.classList.add('grid-line', 'vertical-line');
+                line.style.left = `${i * cellSize}px`;
+                board.appendChild(line);
             }
         }
 
