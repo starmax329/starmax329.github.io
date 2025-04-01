@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Snake Game</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f4f4f4;
+            font-family: Arial, sans-serif;
+        }
+        #game-board {
+            width: 400px;
+            height: 400px;
+            background-color: #000;
+            position: relative;
+            border: 2px solid #fff;
+        }
+        .snake {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background-color: #00ff00;
+            border-radius: 4px;
+            transition: transform 0.1s linear; /* Smooth transition for snake movement */
+        }
+        .food {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background-color: red;
+            border-radius: 50%;
+            animation: foodPop 0.3s ease; /* Food popping effect */
+        }
+        #score {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            color: white;
+            font-size: 20px;
+        }
+        /* Animation for food spawn */
+        @keyframes foodPop {
+            0% {
+                transform: scale(0);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="game-board">
+        <div id="score">Score: 0</div>
+    </div>
+
+    <script>
+        const board = document.getElementById('game-board');
+        const scoreDisplay = document.getElementById('score');
+        const gridSize = 20;
+        let snake = [{ x: 5, y: 5 }];
+        let direction = { x: 1, y: 0 };
+        let food = { x: 10, y: 10 };
+        let score = 0;
+        let gameInterval;
+
+        // Initialize the game
+        function startGame() {
+            snake = [{ x: 5, y: 5 }];
+            direction = { x: 1, y: 0 };
+            score = 0;
+            food = generateFood();
+            scoreDisplay.textContent = `Score: ${score}`;
+            if (gameInterval) clearInterval(gameInterval);
+            gameInterval = setInterval(updateGame, 150); // Slower speed here (150ms interval)
+        }
+
+        // Update game state
+        function updateGame() {
+            const head = { ...snake[0] };
+            head.x += direction.x;
+            head.y += direction.y;
+
+            if (head.x < 0 || head.x >= gridSize || head.y < 0 || head.y >= gridSize || isSnakeCollision(head)) {
+                gameOver();
+                return;
+            }
+
+            snake.unshift(head);
+
+            // Check if snake eats food
+            if (head.x === food.x && head.y === food.y) {
+                score += 10;
+                food = generateFood();
+                scoreDisplay.textContent = `Score: ${score}`;
+            } else {
+                snake.pop();
+            }
+
+            drawGame();
+        }
+
+        // Draw the game board (snake and food)
+        function drawGame() {
+            board.innerHTML = `<div id="score">Score: ${score}</div>`;
+
+            // Draw snake with smooth transitions
+            snake.forEach(segment => {
+                const snakePart = document.createElement('div');
+                snakePart.style.left = `${segment.x * gridSize}px`;
+                snakePart.style.top = `${segment.y * gridSize}px`;
+                snakePart.classList.add('snake');
+                board.appendChild(snakePart);
+            });
+
+            // Draw food
+            const foodElement = document.createElement('div');
+            foodElement.style.left = `${food.x * gridSize}px`;
+            foodElement.style.top = `${food.y * gridSize}px`;
+            foodElement.classList.add('food');
+            board.appendChild(foodElement);
+        }
+
+        // Generate new food position
+        function generateFood() {
+            let foodPosition;
+            while (true) {
+                foodPosition = {
+                    x: Math.floor(Math.random() * gridSize),
+                    y: Math.floor(Math.random() * gridSize)
+                };
+                if (!isSnakeCollision(foodPosition)) break;
+            }
+            return foodPosition;
+        }
+
+        // Check if the snake collides with itself
+        function isSnakeCollision(position) {
+            return snake.some(segment => segment.x === position.x && segment.y === position.y);
+        }
+
+        // Handle key press events for controlling the snake
+        function handleKeyPress(event) {
+            if (event.key === 'ArrowUp' && direction.y === 0) direction = { x: 0, y: -1 };
+            if (event.key === 'ArrowDown' && direction.y === 0) direction = { x: 0, y: 1 };
+            if (event.key === 'ArrowLeft' && direction.x === 0) direction = { x: -1, y: 0 };
+            if (event.key === 'ArrowRight' && direction.x === 0) direction = { x: 1, y: 0 };
+        }
+
+        // Game over function with smooth fade-out
+        function gameOver() {
+            clearInterval(gameInterval);
+            board.style.transition = 'opacity 1s ease';
+            board.style.opacity = 0;
+            setTimeout(() => {
+                alert(`Game Over! Final Score: ${score}`);
+                board.style.opacity = 1;
+                startGame();
+            }, 1000);
+        }
+
+        // Start the game when the page loads
+        startGame();
+
+        // Add event listener for keypresses
+        document.addEventListener('keydown', handleKeyPress);
+    </script>
+</body>
+</html>
