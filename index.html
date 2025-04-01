@@ -63,7 +63,9 @@
     <script>
         const board = document.getElementById('game-board');
         const scoreDisplay = document.getElementById('score');
-        const gridSize = 20;
+        const gridSize = 20;  // Number of grid cells per side
+        const boardSize = 400; // Size of the board in pixels
+        const cellSize = boardSize / gridSize; // Size of each cell in pixels
         let snake = [{ x: 5, y: 5 }];
         let direction = { x: 1, y: 0 };
         let food = { x: 10, y: 10 };
@@ -87,7 +89,13 @@
             head.x += direction.x;
             head.y += direction.y;
 
-            if (head.x < 0 || head.x >= gridSize || head.y < 0 || head.y >= gridSize || isSnakeCollision(head)) {
+            // Wrap around logic for walls
+            if (head.x < 0) head.x = gridSize - 1; // Left wall
+            if (head.x >= gridSize) head.x = 0; // Right wall
+            if (head.y < 0) head.y = gridSize - 1; // Top wall
+            if (head.y >= gridSize) head.y = 0; // Bottom wall
+
+            if (isSnakeCollision(head)) {
                 gameOver();
                 return;
             }
@@ -113,16 +121,16 @@
             // Draw snake with smooth transitions
             snake.forEach(segment => {
                 const snakePart = document.createElement('div');
-                snakePart.style.left = `${segment.x * gridSize}px`;
-                snakePart.style.top = `${segment.y * gridSize}px`;
+                snakePart.style.left = `${segment.x * cellSize}px`;
+                snakePart.style.top = `${segment.y * cellSize}px`;
                 snakePart.classList.add('snake');
                 board.appendChild(snakePart);
             });
 
             // Draw food
             const foodElement = document.createElement('div');
-            foodElement.style.left = `${food.x * gridSize}px`;
-            foodElement.style.top = `${food.y * gridSize}px`;
+            foodElement.style.left = `${food.x * cellSize}px`;
+            foodElement.style.top = `${food.y * cellSize}px`;
             foodElement.classList.add('food');
             board.appendChild(foodElement);
         }
@@ -153,16 +161,11 @@
             if (event.key === 'ArrowRight' && direction.x === 0) direction = { x: 1, y: 0 };
         }
 
-        // Game over function with smooth fade-out
+        // Game over function
         function gameOver() {
             clearInterval(gameInterval);
-            board.style.transition = 'opacity 1s ease';
-            board.style.opacity = 0;
-            setTimeout(() => {
-                alert(`Game Over! Final Score: ${score}`);
-                board.style.opacity = 1;
-                startGame();
-            }, 1000);
+            alert(`Game Over! Final Score: ${score}`);
+            startGame();
         }
 
         // Start the game when the page loads
